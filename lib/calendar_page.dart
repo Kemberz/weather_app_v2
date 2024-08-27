@@ -87,7 +87,7 @@ class _CalendarPageState extends State<CalendarPage> {
         title: Text('Select Date Range'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -109,16 +109,18 @@ class _CalendarPageState extends State<CalendarPage> {
                     onPressed: () => _selectDate(context, true),
                     child: Text(_startDate == null 
                       ? 'Select Start Date' 
-                      : 'Start: ${DateFormat('yyyy-MM-dd').format(_startDate!)}'),
+                      : '${DateFormat('yyyy-MM-dd').format(_startDate!)}'),
                   ),
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_forward, color: Theme.of(context).primaryColor),
+                SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => _selectDate(context, false),
                     child: Text(_endDate == null 
                       ? 'Select End Date' 
-                      : 'End: ${DateFormat('yyyy-MM-dd').format(_endDate!)}'),
+                      : '${DateFormat('yyyy-MM-dd').format(_endDate!)}'),
                   ),
                 ),
               ],

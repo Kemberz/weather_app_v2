@@ -42,7 +42,18 @@ class _SearchPageState extends State<SearchPage> {
       }
     }
   }
-    void _navigateToCalendarPage(Map<String, dynamic> city) {
+
+  String _getCountryFlag(String countryCode) {
+    // Convert country code to uppercase to ensure it works
+    countryCode = countryCode.toUpperCase();
+    // Convert each letter to the corresponding regional indicator symbol
+    const int flagOffset = 0x1F1E6;
+    final int firstLetter = countryCode.codeUnitAt(0) - 65 + flagOffset;
+    final int secondLetter = countryCode.codeUnitAt(1) - 65 + flagOffset;
+    return String.fromCharCode(firstLetter) + String.fromCharCode(secondLetter);
+  }
+
+  void _navigateToCalendarPage(Map<String, dynamic> city) {
     // Debug print
     print('Latitude: ${city['latitude']}, Longitude: ${city['longitude']}');
 
@@ -106,15 +117,20 @@ class _SearchPageState extends State<SearchPage> {
           if (_showResults)
             Expanded(
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 300),
                 opacity: _showResults ? 1.0 : 0.0,
                 child: ListView.builder(
                   itemCount: _searchResults.length,
                   itemBuilder: (context, index) {
                     final city = _searchResults[index];
+                    final countryFlag = _getCountryFlag(city['country_code']);
                     return ListTile(
+                      leading: Text(
+                        countryFlag,
+                        style: TextStyle(fontSize: 24),
+                      ),
                       title: Text(city['name']),
-                      subtitle: Text('${city['admin1']} - Population: ${city['population']}'),
+                      subtitle: Text('${city['country']} - Population: ${city['population']}'),
                       onTap: () => _navigateToCalendarPage(city),
                     );
                   },

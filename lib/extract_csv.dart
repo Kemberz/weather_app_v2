@@ -8,7 +8,7 @@ import 'package:share_plus/share_plus.dart';
 class ExtractCsv {
   static Future<Map<String, dynamic>> fetchHourlyData(String latitude, String longitude, DateTime date) async {
     final formattedDate = DateFormat('yyyy-MM-dd').format(date);
-    final url = 'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&hourly=temperature_2m&start_date=$formattedDate&end_date=$formattedDate';
+    final url = 'https://archive-api.open-meteo.com/v1/archive?latitude=$latitude&longitude=$longitude&start_date=$formattedDate&end_date=$formattedDate&hourly=temperature_2m&';
 
     final response = await http.get(Uri.parse(url));
 
@@ -28,9 +28,12 @@ class ExtractCsv {
     final times = data['hourly']['time'] as List<dynamic>;
     final temps = data['hourly']['temperature_2m'] as List<dynamic>;
 
-    String csvContent = 'Time,Temperature (°C)\n';
+    String csvContent = 'Date,Time,Temperature (°C)\n';
     for (int i = 0; i < times.length; i++) {
-      csvContent += '${times[i]},${temps[i]}\n';
+      final dateTime = DateTime.parse(times[i]);
+      final dateStr = DateFormat('yyyy-MM-dd').format(dateTime);
+      final timeStr = DateFormat('HH:mm').format(dateTime);
+      csvContent += '$dateStr,$timeStr,${temps[i]}\n';
     }
 
     final formattedDate = DateFormat('yyyy-MM-dd').format(date);

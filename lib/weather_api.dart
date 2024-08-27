@@ -7,7 +7,7 @@ class WeatherApi {
     final formattedStartDate = DateFormat('yyyy-MM-dd').format(startDate);
     final formattedEndDate = DateFormat('yyyy-MM-dd').format(endDate);
 
-    final url = 'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&daily=temperature_2m_max,temperature_2m_min&start_date=$formattedStartDate&end_date=$formattedEndDate';
+    final url = 'https://archive-api.open-meteo.com/v1/archive?latitude=$latitude&longitude=$longitude&start_date=$formattedStartDate&end_date=$formattedEndDate&daily=temperature_2m_max,temperature_2m_min';
 
     try {
       final response = await http.get(Uri.parse(url));

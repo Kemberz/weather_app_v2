@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 
 class CityApi {
   static Future<List<Map<String, dynamic>>> searchCity(String query) async {
-    // Trim only trailing spaces, keeping internal spaces
     final trimmedQuery = query.trimRight();
     final encodedQuery = Uri.encodeComponent(trimmedQuery);
     final url = 'https://geocoding-api.open-meteo.com/v1/search?name=$encodedQuery&count=5&language=en&format=json';
@@ -26,6 +25,8 @@ class CityApi {
           'longitude': city['longitude'],
           'population': city['population'],
           'admin1': city['admin1'] ?? 'Unknown',
+          'country': city['country'],
+          'country_code': city['country_code'],
         }).toList();
       } else {
         print('API Error: Status ${response.statusCode}, Body: ${response.body}');

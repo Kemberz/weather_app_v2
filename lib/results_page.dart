@@ -13,11 +13,27 @@ class ResultsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     List<FlSpot> minTemps = [];
     List<FlSpot> maxTemps = [];
-    
+    List<FlSpot> avgTemps = [];
+    double overallAvgTemp = 0;
+
     for (int i = 0; i < forecast['daily']['time'].length; i++) {
-      minTemps.add(FlSpot(i.toDouble(), forecast['daily']['temperature_2m_min'][i]));
-      maxTemps.add(FlSpot(i.toDouble(), forecast['daily']['temperature_2m_max'][i]));
+      double minTemp = forecast['daily']['temperature_2m_min'][i];
+      double maxTemp = forecast['daily']['temperature_2m_max'][i];
+      double avgTemp = (minTemp + maxTemp) / 2;
+
+      minTemps.add(FlSpot(i.toDouble(), minTemp));
+      maxTemps.add(FlSpot(i.toDouble(), maxTemp));
+      avgTemps.add(FlSpot(i.toDouble(), avgTemp));
+      overallAvgTemp += avgTemp;
     }
+
+    overallAvgTemp /= forecast['daily']['time'].length;
+
+    // Create overall average line data
+    List<FlSpot> overallAvgLine = List.generate(
+      forecast['daily']['time'].length,
+      (index) => FlSpot(index.toDouble(), overallAvgTemp)
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -81,9 +97,41 @@ class ResultsPage extends StatelessWidget {
                       color: Colors.red,
                       dotData: FlDotData(show: false),
                     ),
+                    LineChartBarData(
+                      spots: avgTemps,
+                      isCurved: true,
+                      color: Colors.green,
+                      dotData: FlDotData(show: false),
+                    ),
+                    LineChartBarData(
+                      spots: overallAvgLine,
+                      isCurved: false,
+                      color: Colors.purple,
+                      dotData: FlDotData(show: false),
+                      dashArray: [5, 5], // This creates the dotted line effect
+                    ),
                   ],
                 ),
               ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Overall Average Temperature: ${overallAvgTemp.toStringAsFixed(1)}°C',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLegendItem(Colors.blue, 'Min'),
+                SizedBox(width: 10),
+                _buildLegendItem(Colors.red, 'Max'),
+                SizedBox(width: 10),
+                _buildLegendItem(Colors.green, 'Daily Avg'),
+                SizedBox(width: 10),
+                _buildLegendItem(Colors.purple, 'Overall Avg', isDotted: true),
+              ],
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -108,6 +156,44 @@ class ResultsPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildLegendItem(Color color, String label, {bool isDotted = false}) {
+    return Row(
+      children: [
+        Container(
+          width: 20,
+          height: 3,
+          decoration: BoxDecoration(
+            color: color,
+            border: isDotted ? Border.all(color: color, width: 1) : null,
+            borderRadius: isDotted ? BorderRadius.circular(1) : null,
+          ),
+          child: isDotted
+              ? LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Flex(
+                      direction: Axis.horizontal,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: List.generate(
+                        5,
+                        (_) => SizedBox(
+                          width: 2,
+                          height: 1,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(color: color),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : null,
+        ),
+        SizedBox(width: 5),
+        Text(label, style: TextStyle(fontSize: 12)),
+      ],
     );
   }
 }

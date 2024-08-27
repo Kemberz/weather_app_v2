@@ -36,16 +36,23 @@ class _DatasheetPageState extends State<DatasheetPage> {
     List<double> maxTemps = (widget.forecast['daily']['temperature_2m_max'] as List<dynamic>).cast<double>();
     List<double> minTemps = (widget.forecast['daily']['temperature_2m_min'] as List<dynamic>).cast<double>();
 
-    for (int i = 0; i < dates.length; i++) {
-      _data.add(WeatherData(
+    _data = List.generate(dates.length, (i) {
+      return WeatherData(
         date: DateTime.parse(dates[i]),
         maxTemp: maxTemps[i],
         minTemp: minTemps[i],
         avgTemp: (maxTemps[i] + minTemps[i]) / 2,
-      ));
-    }
+      );
+    });
 
-    _filteredData = List.from(_data);
+    _resetFilteredData();
+  }
+
+  void _resetFilteredData() {
+    setState(() {
+      _filteredData = List.from(_data);
+      _isFiltering = false;
+    });
   }
 
   void _showHourlyDataPopup(BuildContext context, DateTime date) async {
@@ -159,10 +166,7 @@ class _DatasheetPageState extends State<DatasheetPage> {
                   child: Text('Clear Filters'),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    setState(() {
-                      _filteredData = List.from(_data);
-                      _isFiltering = false;
-                    });
+                    _resetFilteredData();
                   },
                 ),
                 TextButton(
