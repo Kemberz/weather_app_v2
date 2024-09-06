@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'datasheet_page.dart';
+import 'branded_backgroud.dart';
 
 class ResultsPage extends StatelessWidget {
   final Map<String, dynamic> forecast;
@@ -37,9 +38,14 @@ class ResultsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Weather Forecast for $cityName'),
+        title: Text('Weather Forecast for $cityName', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color.fromARGB(0, 0, 0, 0),
       ),
-      body: Padding(
+      extendBodyBehindAppBar: true,
+      body: BrandedBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -48,6 +54,7 @@ class ResultsPage extends StatelessWidget {
               height: 300,
               child: LineChart(
                 LineChartData(
+                  backgroundColor: Colors.white.withOpacity(0.8),
                   minX: 0,
                   maxX: forecast['daily']['time'].length.toDouble() - 1,
                   minY: minTemps.map((e) => e.y).reduce((a, b) => a < b ? a : b) - 5,
@@ -61,8 +68,8 @@ class ResultsPage extends StatelessWidget {
                             return Padding(
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Text(
-                                DateFormat('MM/dd').format(DateTime.parse(forecast['daily']['time'][value.toInt()])),
-                                style: TextStyle(fontSize: 10),
+                                DateFormat('dd/MM').format(DateTime.parse(forecast['daily']['time'][value.toInt()])),
+                                style: TextStyle(fontSize: 10, color: Colors.white),
                               ),
                             );
                           }
@@ -74,7 +81,7 @@ class ResultsPage extends StatelessWidget {
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
-                          return Text('${value.toInt()}°C', style: TextStyle(fontSize: 10));
+                          return Text('${value.toInt()}°C', style: TextStyle(fontSize: 10, color: Colors.white));
                         },
                         reservedSize: 30,
                       ),
@@ -111,13 +118,35 @@ class ResultsPage extends StatelessWidget {
                       dashArray: [5, 5], // This creates the dotted line effect
                     ),
                   ],
+                  lineTouchData: LineTouchData(
+                    touchTooltipData: LineTouchTooltipData(
+                      getTooltipColor:(touchedSpot) {
+                        return const Color.fromARGB(255, 65, 107, 95);
+                      },
+                      getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                        return touchedBarSpots.map((barSpot) {
+                          final flSpot = barSpot;
+                          if (flSpot.x >= 0 && flSpot.x < forecast['daily']['time'].length) {
+                            final date = DateTime.parse(forecast['daily']['time'][flSpot.x.toInt()]);
+                            return LineTooltipItem(
+                              '${DateFormat('dd/MM').format(date)}: ${flSpot.y.toStringAsFixed(1)}°C',
+                              const TextStyle(color: Colors.white),
+                            );
+                          }
+                          return null;
+                        }).toList();
+                      },
+                      fitInsideHorizontally: true,
+                      fitInsideVertically: true,
+                    ),
+                  ),
                 ),
               ),
             ),
             SizedBox(height: 10),
             Text(
               'Overall Average Temperature: ${overallAvgTemp.toStringAsFixed(1)}°C',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 20),
@@ -151,11 +180,12 @@ class ResultsPage extends StatelessWidget {
               child: Text('Show Data'),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 15),
+                foregroundColor: const Color.fromARGB(255, 28, 133, 201), backgroundColor: Colors.white,
               ),
             ),
           ],
         ),
-      ),
+      ),),))
     );
   }
 
@@ -192,7 +222,7 @@ class ResultsPage extends StatelessWidget {
               : null,
         ),
         SizedBox(width: 5),
-        Text(label, style: TextStyle(fontSize: 12)),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.white)),
       ],
     );
   }

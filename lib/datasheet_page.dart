@@ -255,6 +255,7 @@ class _DatasheetPageState extends State<DatasheetPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Data for ${widget.cityName}'),
+        backgroundColor: const Color.fromARGB(255, 28, 133, 201),
         actions: [
           IconButton(
             icon: Icon(_isFiltering ? Icons.filter_list_off : Icons.filter_list),
